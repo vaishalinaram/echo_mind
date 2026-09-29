@@ -120,6 +120,57 @@ def generate_weekly_plan(
     return calendar_entries
 
 
+def project_pillar_mix(
+    pillar_distribution: List[Dict[str, Any]],
+    calendar: List[Dict[str, Any]],
+) -> List[Dict[str, Any]]:
+    """Project pillar allocation after publishing every entry in a calendar."""
+    counts = {
+        str(pillar.get("pillar_name", "General Strategy")): int(pillar.get("post_count", 0) or 0)
+        for pillar in pillar_distribution
+    }
+    targets = {
+        str(pillar.get("pillar_name", "General Strategy")): float(pillar.get("target_share_pct", 0) or 0)
+        for pillar in pillar_distribution
+    }
+    for entry in calendar:
+        pillar_name = str(entry.get("Pillar", "General Strategy"))
+        counts.setdefault(pillar_name, 0)
+        targets.setdefault(pillar_name, 0.0)
+        counts[pillar_name] += 1
+
+    current_total = sum(int(pillar.get("post_count", 0) or 0) for pillar in pillar_distribution)
+    projected_total = current_total + len(calendar)
+    rows = []
+    for pillar_name, projected_count in counts.items():
+        source = next(
+            (pillar for pillar in pillar_distribution if pillar.get("pillar_name") == pillar_name),
+            {},
+        )
+        current_share = float(source.get("actual_share_pct", 0) or 0)
+        target_share = targets[pillar_name]
+        projected_share = projected_count / projected_total * 100 if projected_total else 0.0
+        rows.append(
+            {
+                "Pillar": pillar_name,
+                "Current %": round(current_share, 1),
+                "Target %": round(target_share, 1),
+                "Projected %": round(projected_share, 1),
+                "Gap before (pp)": round(abs(current_share - target_share), 1),
+                "Gap after (pp)": round(abs(projected_share - target_share), 1),
+            }
+        )
+    if rows and projected_total:
+        rounding_delta = round(100.0 - sum(row["Projected %"] for row in rows), 1)
+        largest_share = max(rows, key=lambda row: row["Projected %"])
+        largest_share["Projected %"] = round(largest_share["Projected %"] + rounding_delta, 1)
+        largest_share["Gap after (pp)"] = round(
+            abs(largest_share["Projected %"] - largest_share["Target %"]),
+            1,
+        )
+    return rows
+
+
 def export_calendar_csv(calendar: List[Dict[str, Any]]) -> str:
     """Export calendar entries to standard CSV format."""
     if not calendar:

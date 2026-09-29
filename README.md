@@ -78,7 +78,9 @@ agent/orchestrator.py ──► strategy/engine.py ──► database/ (SQLite) 
 3. **Exportable Weekly Editorial Calendar:** Converts detected strategic deficits into a balanced 5-day editorial plan exportable directly as **CSV** and **Markdown**.
 4. **Honest Uncertainty:** Clearly identifies low-evidence recommendations as *Exploratory* and displays an explicit assumptions callout when historical volume or feedback is sparse.
 5. **Belief Conviction Timeline:** Visualizes how the agent's confidence in strategic beliefs strengthens over time as supporting evidence accumulates.
-6. **Theme-aware interface:** Streamlit's built-in Light, Dark, and System modes, theme-driven chart colors, neutral surfaces, and responsive page layouts.
+6. **Pillar opportunity map:** Relates allocation gaps to historical engagement so teams can distinguish high-performing under-served topics from saturated ones.
+7. **Portfolio impact simulator:** Projects how the proposed weekly calendar changes pillar shares and total distance from target; it is explicitly a planning scenario, not an engagement forecast.
+8. **Theme-aware interface:** Streamlit's built-in Light, Dark, and System modes, theme-driven chart colors, neutral surfaces, and responsive page layouts.
 
 ---
 

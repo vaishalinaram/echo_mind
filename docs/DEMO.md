@@ -16,8 +16,8 @@ Say: “Stateless writing tools forget what a team rejected. They repeat the sam
 Show the EchoMind title and the page navigation.
 
 **0:08–0:18 | Overview gap**  
-Say: “EchoMind starts with measured history. Engineering Culture is at 6.7% against a 20% target, while architecture is already over target.”  
-Point to the pillar allocation chart and the gaps/saturation rows.
+Say: “EchoMind starts with measured history. Engineering Culture is at 6.7% against a 20% target, while architecture is already over target. The opportunity map combines that imbalance with engagement.”  
+Point to the pillar allocation chart, the opportunity map, and the gaps/saturation rows.
 
 **0:18–0:31 | Strategy provenance**  
 Say: “The strategy page explains why this pillar, why now, and why this format. This provenance row ties the choice to measured performance; the memory rows show which brand rules and beliefs were recalled.”  
@@ -36,4 +36,4 @@ Say: “Before a draft is used, deterministic checks report pass or fail with a 
 Return to **Strategy**, generate a draft, and point to the guardrail table.
 
 **1:08–1:15 | Close**  
-Say: “The important part is visible: a remembered critique changed the plan, and every decision remains auditable.”
+Say: “The plan even shows its projected effect on the content mix. A remembered critique changed the recommendation, and every decision remains auditable.”

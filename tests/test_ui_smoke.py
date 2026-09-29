@@ -20,6 +20,7 @@ def test_every_registered_page_renders_with_mock_memory(monkeypatch):
     app_path = Path(__file__).resolve().parents[1] / "ui" / "app.py"
     app = AppTest.from_file(str(app_path), default_timeout=20).run()
     assert not app.exception, [str(error.value) for error in app.exception]
+    assert len(app.get("vega_lite_chart")) >= 2, "Overview should render allocation and opportunity charts."
 
     for page_path in (
         "pages/overview.py",
@@ -31,6 +32,11 @@ def test_every_registered_page_renders_with_mock_memory(monkeypatch):
     ):
         app.switch_page(page_path).run()
         assert not app.exception, f"{page_path}: {[str(error.value) for error in app.exception]}"
+
+    app.switch_page("pages/strategy.py").run()
+    next(button for button in app.button if button.label == "Generate recommendation").click().run()
+    assert not app.exception, [str(error.value) for error in app.exception]
+    assert app.get("vega_lite_chart"), "Strategy page should render the portfolio impact chart."
 
 
 def test_strategy_discloses_unreachable_hindsight(tmp_path, monkeypatch):

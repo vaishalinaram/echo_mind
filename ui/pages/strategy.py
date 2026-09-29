@@ -1,10 +1,16 @@
 """Strategy page: Recommendation generation with decision provenance, guardrail checks, and weekly calendar export."""
 
+import altair as alt
 import pandas as pd
 import streamlit as st
 
 from agent.guardrails import evaluate_guardrails
-from strategy.calendar import export_calendar_csv, export_calendar_markdown, generate_weekly_plan
+from strategy.calendar import (
+    export_calendar_csv,
+    export_calendar_markdown,
+    generate_weekly_plan,
+    project_pillar_mix,
+)
 from ui.styles import badge_html, render_header
 
 
@@ -254,6 +260,43 @@ def render_strategy() -> None:
         cal_df = pd.DataFrame(calendar)
         display_cols = ["Day", "Pillar", "Format", "Platform", "Objective", "Working Title / Angle"]
         st.dataframe(cal_df[display_cols], use_container_width=True, hide_index=True)
+
+        st.subheader("Portfolio impact simulator")
+        st.caption("Scenario, not a performance forecast: see how publishing this plan would shift pillar share toward or away from targets.")
+        projection = project_pillar_mix(analysis.pillar_distribution, calendar)
+        projection_df = pd.DataFrame(projection)
+        total_gap_before = sum(row["Gap before (pp)"] for row in projection)
+        total_gap_after = sum(row["Gap after (pp)"] for row in projection)
+        gap_col, posts_col = st.columns(2)
+        with gap_col:
+            st.metric(
+                "Total distance from targets",
+                f"{total_gap_after:.1f} pp",
+                delta=f"{total_gap_after - total_gap_before:+.1f} pp",
+                delta_color="inverse",
+            )
+        with posts_col:
+            st.metric("Planned posts simulated", len(calendar))
+
+        impact_data = projection_df.melt(
+            id_vars=["Pillar"],
+            value_vars=["Current %", "Target %", "Projected %"],
+            var_name="Scenario",
+            value_name="Share %",
+        )
+        impact_chart = (
+            alt.Chart(impact_data)
+            .mark_bar(cornerRadiusTopLeft=3, cornerRadiusTopRight=3)
+            .encode(
+                x=alt.X("Pillar:N", title=None, axis=alt.Axis(labelAngle=-20)),
+                y=alt.Y("Share %:Q", title="Share of published posts (%)"),
+                xOffset="Scenario:N",
+                color=alt.Color("Scenario:N", legend=alt.Legend(title=None, orient="top")),
+                tooltip=["Pillar", "Scenario", "Share %"],
+            )
+            .properties(height=280)
+        )
+        st.altair_chart(impact_chart, use_container_width=True, theme="streamlit")
 
         col_csv, col_md = st.columns(2)
         with col_csv:

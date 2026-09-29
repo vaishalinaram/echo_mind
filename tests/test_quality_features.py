@@ -11,6 +11,7 @@ from strategy.calendar import (
     export_calendar_csv,
     export_calendar_markdown,
     generate_weekly_plan,
+    project_pillar_mix,
 )
 from strategy.engine import StrategyAnalysisResult
 
@@ -86,6 +87,24 @@ def test_weekly_plan_and_exports_are_balanced_and_complete():
     markdown = export_calendar_markdown(plan, "Test brand")
     assert "Weekly Editorial Calendar" in markdown
     assert "Strategic Alignment Notes" in markdown
+
+
+def test_calendar_projection_shows_resulting_pillar_mix():
+    pillars = [
+        {"pillar_name": "Engineering Culture", "post_count": 1, "actual_share_pct": 8.0, "target_share_pct": 20.0},
+        {"pillar_name": "Architecture", "post_count": 6, "actual_share_pct": 50.0, "target_share_pct": 35.0},
+        {"pillar_name": "Product", "post_count": 3, "actual_share_pct": 25.0, "target_share_pct": 25.0},
+        {"pillar_name": "Team", "post_count": 2, "actual_share_pct": 17.0, "target_share_pct": 20.0},
+    ]
+    calendar = [{"Pillar": "Engineering Culture"}, {"Pillar": "Product"}]
+
+    projection = project_pillar_mix(pillars, calendar)
+
+    gap = next(row for row in projection if row["Pillar"] == "Engineering Culture")
+    assert gap["Current %"] == 8.0
+    assert gap["Projected %"] > gap["Current %"]
+    assert gap["Gap after (pp)"] < gap["Gap before (pp)"]
+    assert round(sum(row["Projected %"] for row in projection), 1) == 100.0
 
 
 def test_confidence_and_provenance_reflect_recalled_evidence():

@@ -117,6 +117,27 @@ def render_overview() -> None:
             )
             st.altair_chart(chart, use_container_width=True, theme="streamlit")
 
+    st.subheader("Pillar opportunity map")
+    st.caption("Look for under-served pillars with above-average engagement before adding more volume to already saturated topics.")
+    if not pillar_df.empty:
+        avg_engagement = float(pillar_df["Avg engagement %"].mean())
+        opportunity_chart = (
+            alt.Chart(pillar_df)
+            .mark_circle(opacity=0.85, stroke="var(--background-color)", strokeWidth=1)
+            .encode(
+                x=alt.X("Delta %:Q", title="Actual share minus target (percentage points)"),
+                y=alt.Y("Avg engagement %:Q", title="Average engagement (%)"),
+                size=alt.Size("Posts:Q", title="Published posts", scale=alt.Scale(range=[80, 700])),
+                color=alt.Color("Pillar:N", legend=None),
+                tooltip=["Pillar", "Posts", "Actual %", "Target %", "Delta %", "Avg engagement %"],
+            )
+            + alt.Chart(pd.DataFrame({"x": [0]})).mark_rule(strokeDash=[5, 4]).encode(x="x:Q")
+            + alt.Chart(pd.DataFrame({"y": [avg_engagement]})).mark_rule(strokeDash=[5, 4]).encode(y="y:Q")
+        ).properties(height=260)
+        st.altair_chart(opportunity_chart, use_container_width=True, theme="streamlit")
+    else:
+        st.caption("No pillar performance data is available for this selection.")
+
     st.markdown("---")
 
     # Format Performance and Benchmark Posts
