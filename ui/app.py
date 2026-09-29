@@ -20,7 +20,20 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
+import os
+
 import streamlit as st
+
+# On Streamlit Community Cloud, secrets are provided via st.secrets rather than
+# a .env file. Bridge top-level string secrets into environment variables BEFORE
+# importing config.settings (which reads os.getenv at import time). This is a
+# no-op locally: setdefault never overrides real env vars or values from .env.
+try:
+    for _key, _value in st.secrets.items():
+        if isinstance(_value, str):
+            os.environ.setdefault(_key, _value)
+except Exception:
+    pass
 
 from config.settings import settings
 from ui.context import ensure_database_ready, build_agent, MOCK_BACKEND, HINDSIGHT_BACKEND
