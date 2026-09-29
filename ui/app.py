@@ -24,7 +24,7 @@ import streamlit as st
 
 from config.settings import settings
 from ui.context import ensure_database_ready, build_agent, MOCK_BACKEND, HINDSIGHT_BACKEND
-from ui.styles import apply_custom_styles, badge_html
+from ui.styles import apply_custom_styles, badge_html, render_hero
 
 st.set_page_config(
     page_title="EchoMind — Content Strategy Agent",
@@ -34,6 +34,7 @@ st.set_page_config(
 )
 
 apply_custom_styles()
+render_hero()
 
 # Ensure database is ready
 repo = ensure_database_ready()
